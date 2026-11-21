@@ -1,0 +1,131 @@
+[build-system]
+requires = ["setuptools>=84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultrarag"
+version = "0.3.0.2"
+description = "UltraRAG"
+readme = "README.md"
+requires-python = ">=3.11, <3.13"
+dependencies = [
+    # 3.4.5 requires Starlette >=1 through its client extra; MinerU/Gradio need <1.
+    "fastmcp>=3.3.1,<3.4.5",
+    "mcp",
+    "rich",
+    "pandas",
+    "Jinja2",
+    "openai",
+    "httpx[socks]",
+    "python-dotenv",
+    "PyYAML",
+    "tqdm",
+    "requests",
+    "orjson",
+    "tabulate",
+    "aiohttp",
+    "pillow",
+    "flask",
+    # faiss-gpu-cu12 1.14 requires NumPy 2; <2.4 also satisfies vLLM/Numba.
+    "numpy>=2,<2.4",
+    "fakeredis",
+    "pymilvus",
+    "pypinyin",
+    "jieba",
+    "charset-normalizer",
+    "python-docx",
+    "pymupdf",
+    "chonkie",
+    "tiktoken",
+]
+
+[project.optional-dependencies]
+retriever = [
+    "infinity-emb",
+    "sentence-transformers",
+    "openai",
+    "bm25s",
+    "faiss-gpu-cu12; sys_platform != 'darwin'",
+    "faiss-cpu; sys_platform == 'darwin'",
+    "exa_py",
+    "tavily-python",
+    "pymilvus",
+    "qdrant-client",
+    "numba",
+    "torch",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+]
+
+generation = [
+    # Newer cu129 wheels currently pull CUDA 13 tooling or conflict with MinerU.
+    "vllm==0.22.1",
+    "openai",
+    "transformers",
+    "torch",
+    # 0.2.4 has no CPython 3.12 Linux x86_64 wheel.
+    "xgrammar<0.2.4",
+]
+
+evaluation = [
+    "rouge-score",
+    "pytrec-eval-terrier",
+]
+
+corpus = [
+    "mineru[core]>=3,<4",
+]
+
+# LiteLLM generation backend: a pure API client, so it is kept separate from the
+# heavy `generation` extra (vllm/torch) — CPU/proxy users can install just this.
+litellm = [
+    "litellm>=1.60,<2.0",
+]
+
+all = [
+    "ultrarag[retriever]",
+    "ultrarag[generation]",
+    "ultrarag[litellm]",
+    "ultrarag[corpus]",
+    "ultrarag[evaluation]",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+ultrarag = "ultrarag.client:main"
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "ipython",
+    "jupyter",
+    "pytest",
+]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+vllm = { index = "vllm-cu129" }
+torch = [
+    { index = "pytorch-cu129", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "pytorch-cu129", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchaudio = [
+    { index = "pytorch-cu129", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu129"
+url = "https://download.pytorch.org/whl/cu129"
+explicit = true
+
+[[tool.uv.index]]
+name = "vllm-cu129"
+url = "https://wheels.vllm.ai/0.22.1/cu129"
+explicit = true

@@ -1,0 +1,23 @@
+# Git and editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Python caches
+.venv/
+.uv-cache/
+__pycache__/
+*.pyc
+
+# Runtime data
+logs/
+output/
+data/
+test/
+tests/
+ui/storage/
+
+# Frontend artifacts
+**/node_modules/
+ui/frontend/dist/
